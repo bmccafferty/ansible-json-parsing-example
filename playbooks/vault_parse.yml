@@ -1,0 +1,33 @@
+- name: JSON Work with Pure Ansible (Built In)
+  hosts: all
+  gather_facts: false
+  tasks:
+
+    - name: Include vars
+      ansible.builtin.include_vars: ../vars/auth.yml
+
+    - name: URI Call to Pull some data
+      ansible.builtin.uri:
+        url: http://vault:8200/v1/cubbyhole/supersecretthing
+        method: GET
+        return_content: true
+        headers:
+          Content-Type: application/json
+          X-Vault-Token: "{{ vault_token  }}"
+      register: secret_return
+
+    - name: Debug Display Return
+      ansible.builtin.debug:
+        var: secret_return
+
+    - name: Debug Display Return
+      ansible.builtin.debug:
+        var: secret_return.json
+
+    - name: Debug Display Return
+      ansible.builtin.debug:
+        var: secret_return.json.data.password
+
+    - name: Use the var to do something ....
+      ansible.builtin.debug:
+        msg:  I pulled a password from Hashi Vault and want to tell the world its {{ secret_return.json.data.password  }}
